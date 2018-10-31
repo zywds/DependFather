@@ -6,8 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="Depend-common" />
         <module name="Depend-dao" />
         <module name="Depend-entities" />
+        <module name="Depend-service" />
         <module name="Depend-ui" />
       </profile>
     </annotationProcessing>
