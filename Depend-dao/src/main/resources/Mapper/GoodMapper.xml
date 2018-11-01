@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.zhangyuwei.depend.mapper.IGoodDao"><!--接口名-->
+    <!--查询所有的商品-->
+    <!--id应该是接口中的方法，结果类型如没有配置别名则应该使用全名称 -->
+    <select id="selectAllGood" resultType="Good">
+        select *from good
+    </select>
+    <!--添加商品-->
+    <insert id="insertGood" parameterType="Good">
+        insert into good(gName,gPrice,gPicture) values(#{gname},#{gprice},#{gpicture})
+    </insert>
+    <!--修改商品-->
+    <update id="updateGood" parameterType="Good">
+        update good set gName=#{gname},gPrice=#{gprice},gPicture=#{gpicture} where gId=#{gid}
+    </update>
+    <!--删除商品-->
+    <delete id="deleteGood" parameterType="int">
+        delete from good where gId=#{gid}
+    </delete>
+    <!--查询商品数量-->
+    <select id="selectGoodCount" resultType="int">
+        select count(*)from good
+    </select>
+    <!--根据编号进行查询-->
+    <select id="selectGoodById" parameterType="int" resultType="Good">
+        select *from good where gId=#{gid}
+    </select>
+    <!--分页--><!--这里可以根据错误提示更改参数名-->
+    <select id="selectGoodPage" resultType="Good">
+        select *from good limit ${param1},${param2}
+    </select>
+    <!--多条件查询-->
+    <select id="selectGoodMoreIf" resultType="Good">
+        select *from good
+        <where>
+            <if test="gname !=null">
+                gName like '%${gname}%'
+            </if>
+            <if test="gid !=null">
+                or gId=#{gid}
+            </if>
+        </where>
+    </select>
+    <!--批量删除-->
+    <delete id="deleteGoodMore" parameterType="int">
+        delete from good
+        <foreach collection="list" open=" where gId in(" separator="," close=")" item="gid">
+            #{gid}
+        </foreach>
+    </delete>
+</mapper>

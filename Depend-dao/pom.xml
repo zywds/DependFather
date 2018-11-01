@@ -66,8 +66,13 @@
         </dependency>
         <!--c3p0 连接池 -->
         <dependency>
-            <groupId>c3p0</groupId>
+            <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
+        </dependency>
+        <!--此依赖可以使得服务器出现RequestMapping-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
         </dependency>
     </dependencies>
 

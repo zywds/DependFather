@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+</head>
+<style>
+    table,tr,td{border-collapse: collapse;border:1px solid red;}
+    table{width: 100%;text-align: center;}
+    #test10{background-size: 100% 100%;background-repeat: no-repeat}
+</style>
+<body><p>
+    <a href="GoodServlet/joinxml">导出xml</a>
+<form action="GoodServlet/outxml" method="post"  enctype="multipart/form-data">
+    <input type="file" name="files"/>
+    <button>导入xml</button>
+</form>
+</p>
+<!--分页-->
+<div id="demo11"></div>
+<table>
+    <thead>
+    <tr>
+        <td><input type="checkbox" class="cheBoxMain"/></td>
+        <td>编号</td>
+        <td>名称</td>
+        <td>价格</td>
+        <td>图片</td>
+        <td>操作</td>
+    </tr>
+    </thead>
+    <tbody id="tbodyShow">
+
+    </tbody>
+</table>
+<input type="button" value="多项删除" id="btnMoreDelete"/>
+<fieldset>
+    <legend>数据操作</legend>
+    <p>
+        <label>名称：</label>
+        <input type="text" id="gname"/>
+    </p>
+    <p>
+        <label>价格：</label>
+        <input type="text" id="gprice"/>
+    </p>
+    <p>
+        <label for="files">图片：</label>
+        <div class="layui-upload-drag" id="test10">
+            <i class="layui-icon"></i>
+            <p>点击上传，或将文件拖拽到此处</p>
+        </div>
+    </p>
+    <p>
+        <input type="button" value="添加" id="btnAdd"/>
+        <input type="button" value="修改" id="btnUpdate"/>
+    </p>
+</fieldset>
+<script src="js/jquery-1.11.3.js"></script>
+<script src="js/layui/layui.all.js"></script>
+<script>
+    var gpicture="";var updateid="";
+    /*文件上传*/
+    layui.use('upload', function() {
+        var $ = layui.jquery
+            , upload = layui.upload;
+            upload.render({
+                elem: '#test10'
+                ,url: 'GoodServlet/fileSave'
+                ,method:'post'
+                ,done: function(res){
+                    $("#test10").css("backgroundImage","url(image/"+res.data+")");
+                    gpicture=res.data;
+                }
+            });
+    });
+    /*分页*/
+    var pages="";var limits="";
+    layui.use(['laypage', 'layer'], function() {
+        var laypage = layui.laypage
+            , layer = layui.layer;
+        //分页方法
+        function selectPage() {
+            /*查询所有*/
+            var number = "";
+            $.ajax({
+                url:'GoodServlet/selectGoodCount',
+                type:'post',
+                contentType:'application/json;charset=UTF-8',
+                success:function (result) {
+                    number=result;
+                    /*分页查询*/
+                    laypage.render({
+                        elem: 'demo11'
+                        , count: number //数据总数
+                        , limit: 4
+                        , curr: pages
+                        , jump: function (objs) {
+                            pages = objs.curr;
+                            limits = objs.limit;
+                            var integerList=[];
+                            integerList.push(pages);
+                            integerList.push(limits);
+                            /*得到返回结果*/
+                            /*先清除数据*/
+                            $("#tbodyShow tr").remove();
+                            $.ajax({
+                                type: 'post',
+                                url: 'GoodServlet/selectGoodPage',
+                                data: JSON.stringify(integerList),
+                                contentType:'application/json;charset=UTF-8',
+                                success: function (result) {
+                                    $.each(result,function (i,obj) {
+                                        $("<tr/>").append($("<input type='checkbox' class='cheBoxSon' value='"+obj.gid+"'/>").data("obj",obj.gid))
+                                            .append($("<td/>").html(obj.gid))
+                                            .append($("<td/>").html(obj.gname))
+                                            .append($("<td/>").html(obj.gprice))
+                                            .append($("<td/>").html($("<img src='"+"image/"+obj.gpicture+"' width='26px' height='20px'/>")).data("obj",obj.gpicture))
+                                            .append($("<input type='button' value='删除' class='btnDel'/>").data("obj",obj.gid))
+                                            .append($("<input type='button' value='编辑' class='btnEdit'/>").data("obj",obj))
+                                            .appendTo($("#tbodyShow"));
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        };
+        /*删改查*/
+        var app={
+            /*select:function(){
+                $("#tbodyShow tr").remove();
+                $.ajax({
+                    url:'GoodServlet/selectAllGood',
+                    type:'post',
+                    contentType:'application/json;charset=UTF-8',
+                    dataType:'json',
+                    success:function (result) {
+                        $.each(result,function (i,obj) {
+                            $("<tr/>").append($("<input type='checkbox' class='cheBoxSon' value='"+obj.gid+"'/>").data("obj",obj.gid))
+                                .append($("<td/>").html(obj.gid))
+                                .append($("<td/>").html(obj.gname))
+                                .append($("<td/>").html(obj.gprice))
+                                .append($("<td/>").html($("<img src='"+"image/"+obj.gpicture+"' width='26px' height='20px'/>")).data("obj",obj.gpicture))
+                                .append($("<input type='button' value='删除' class='btnDel'/>").data("obj",obj.gid))
+                                .append($("<input type='button' value='编辑' class='btnEdit'/>").data("obj",obj))
+                                .appendTo($("#tbodyShow"));
+                        });
+                    }
+                });
+            },*/
+            /*添加*/
+            insert:function(){
+                var goodList=new Array();
+                goodList.push({
+                    gname: $("#gname").val(),
+                    gprice:$("#gprice").val(),
+                    gpicture:gpicture
+                });
+                $.ajax({
+                    url:'GoodServlet/insertGood',
+                    type:'post',
+                    data: JSON.stringify(goodList),
+                    contentType:'application/json;charset=UTF-8',
+                    success:function (result) {
+                        alert(result);selectPage();
+                        $("#gname").val("");$("#gprice").val("");gpicture="";
+                        $("#test10").css("backgroundImage","");
+                    }
+                });
+            },
+            /*删除*/
+            del:function(obj){
+                var gid=obj;
+                $.ajax({
+                    url:'GoodServlet/deleteGood',
+                    type:'post',
+                    data: JSON.stringify(gid),
+                    contentType:'application/json;charset=UTF-8',
+                    success:function (result) {
+                        alert(result);selectPage();
+                    }
+                });
+            },
+            /*修改*/
+            update:function(){
+                var goodList=new Array();
+                goodList.push({
+                    gname: $("#gname").val(),
+                    gprice:$("#gprice").val(),
+                    gpicture:gpicture,
+                    gid:updateid
+                });
+                $.ajax({
+                    url:'GoodServlet/updateGood',
+                    type:'post',
+                    data: JSON.stringify(goodList),
+                    contentType:'application/json;charset=UTF-8',
+                    success:function (result) {
+                        alert(result);selectPage();
+                        $("#gname").val("");$("#gprice").val("");gpicture="";
+                        $("#test10").css("backgroundImage","");updateid="";
+                    }
+                });
+            },
+            /*多项删除*/
+            deleteMore:function(){
+                var integerList=[];
+                $(".cheBoxSon:checked").each(function () {
+                    integerList.push($(this).val());
+                });
+                $.ajax({
+                    url:'GoodServlet/deleteGoodMore',
+                    type:'post',
+                    data: JSON.stringify(integerList),
+                    contentType:'application/json;charset=UTF-8',
+                    success:function (result) {
+                        alert(result);selectPage();
+                    }
+                });
+            },
+            /*点击事件*/
+            clicks:function(){
+                $("#tbodyShow").on("click",".btnDel",function () {
+                    var gid=$(this).data("obj");
+                    app.del(gid);
+                });
+                $("#btnAdd").click(function () {
+                    app.insert();
+                });
+                $("#tbodyShow").on("click",".btnEdit",function () {
+                    var obj=$(this).data("obj");
+                    updateid=obj.gid;
+                    $("#gname").val(obj.gname);$("#gprice").val(obj.gprice);
+                    $("#test10").css("backgroundImage","url(image/"+obj.gpicture+")");
+                    gpicture=obj.gpicture;
+                });
+                $("#btnUpdate").click(function () {
+                    app.update();
+                });
+                $(".cheBoxMain").click(function () {
+                    if($(".cheBoxMain").prop("checked")==true){
+                        $(".cheBoxSon").prop("checked",true);
+                    }else if($(".cheBoxMain").prop("checked")==false){
+                        $(".cheBoxSon").prop("checked",false);
+                    }
+                });
+                $("#tbodyShow").on("click",".cheBoxSon",function () {
+                    if($(this).prop("checked")==false){
+                        $(this).prop("checked",false);
+                        $(".cheBoxMain").prop("checked",false);
+                    }if($(this).prop("checked")==true){
+                        $(this).prop("checked",true);
+                    }if(($(".cheBoxSon:checked").length)==($(".cheBoxSon").length)){
+                        $(".cheBoxMain").prop("checked",true);
+                    }
+                });
+                $("#btnMoreDelete").click(function () {
+                    app.deleteMore();
+                });
+            },
+            /*初始化*/
+            init:function () {
+                selectPage();
+                app.clicks();
+            }
+        };
+        app.init();
+    });
+</script>
+</body>
+</html>
