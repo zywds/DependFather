@@ -19,6 +19,9 @@
 </p>
 <!--分页-->
 <div id="demo11"></div>
+<input type="text" placeholder="请输入名称" id="nameMoreIf"/>
+<input type="text" placeholder="请输入价格" id="priceMoreIf"/>
+<input type="button" value="查询" id="btnMoreIf"/>
 <table>
     <thead>
     <tr>
@@ -46,7 +49,7 @@
         <input type="text" id="gprice"/>
     </p>
     <p>
-        <label for="files">图片：</label>
+        <label>图片：</label>
         <div class="layui-upload-drag" id="test10">
             <i class="layui-icon"></i>
             <p>点击上传，或将文件拖拽到此处</p>
@@ -84,9 +87,15 @@
         function selectPage() {
             /*查询所有*/
             var number = "";
+            var names= $("#nameMoreIf").val();
+            var prices=$("#priceMoreIf").val();
+            var objectList=[];
+            objectList.push(names);
+            objectList.push(prices);
             $.ajax({
-                url:'GoodServlet/selectGoodCount',
+                url:'GoodServlet/selectGoodCountMoreIf',
                 type:'post',
+                data:JSON.stringify(objectList),
                 contentType:'application/json;charset=UTF-8',
                 success:function (result) {
                     number=result;
@@ -102,14 +111,20 @@
                             var integerList=[];
                             integerList.push(pages);
                             integerList.push(limits);
+                            integerList.push(names);
+                            integerList.push(prices);
+                            console.log(integerList);
                             /*得到返回结果*/
                             /*先清除数据*/
                             $("#tbodyShow tr").remove();
                             $.ajax({
                                 type: 'post',
-                                url: 'GoodServlet/selectGoodPage',
+                                url: 'GoodServlet/selectGoodMoreIfPage',
                                 data: JSON.stringify(integerList),
                                 contentType:'application/json;charset=UTF-8',
+                                beforeSend:function(){
+                                  console.log(integerList);
+                                },
                                 success: function (result) {
                                     $.each(result,function (i,obj) {
                                         $("<tr/>").append($("<input type='checkbox' class='cheBoxSon' value='"+obj.gid+"'/>").data("obj",obj.gid))
@@ -180,7 +195,7 @@
                     data: JSON.stringify(gid),
                     contentType:'application/json;charset=UTF-8',
                     success:function (result) {
-                        alert(result);selectPage();
+                        alert(result.msg);selectPage();
                     }
                 });
             },
@@ -259,6 +274,36 @@
                 });
                 $("#btnMoreDelete").click(function () {
                     app.deleteMore();
+                });
+                /*多条件查询*/
+                $("#btnMoreIf").click(function () {
+                    /*var goodList=new Array();
+                    goodList.push({
+                        gname: $("#nameMoreIf").val(),
+                        gprice:$("#priceMoreIf").val()
+                    });
+                    $.ajax({
+                        url:'GoodServlet/selectGoodMoreIf',
+                        type:'post',
+                        data: JSON.stringify(goodList),
+                        contentType:'application/json;charset=UTF-8',
+                        success:function (result) {
+                            /!*先清除数据*!/
+                            $("#tbodyShow tr").remove();
+                            $.each(result,function (i,obj) {
+                                $("<tr/>").append($("<input type='checkbox' class='cheBoxSon' value='"+obj.gid+"'/>").data("obj",obj.gid))
+                                    .append($("<td/>").html(obj.gid))
+                                    .append($("<td/>").html(obj.gname))
+                                    .append($("<td/>").html(obj.gprice))
+                                    .append($("<td/>").html($("<img src='"+"image/"+obj.gpicture+"' width='26px' height='20px'/>")).data("obj",obj.gpicture))
+                                    .append($("<input type='button' value='删除' class='btnDel'/>").data("obj",obj.gid))
+                                    .append($("<input type='button' value='编辑' class='btnEdit'/>").data("obj",obj))
+                                    .appendTo($("#tbodyShow"));
+                            });
+                            $("#nameMoreIf").val("");$("#priceMoreIf").val("");
+                        }
+                    });*/
+                    selectPage();
                 });
             },
             /*初始化*/

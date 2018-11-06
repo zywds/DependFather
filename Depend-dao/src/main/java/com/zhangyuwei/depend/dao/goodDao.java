@@ -1,6 +1,7 @@
 package com.zhangyuwei.depend.dao;
 
 import com.zhangyuwei.depend.entities.Good;
+import com.zhangyuwei.depend.entities.GoodPage;
 import com.zhangyuwei.depend.mapper.IGoodDao;
 import com.zhangyuwei.depend.mybatis.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
@@ -53,6 +54,11 @@ public class goodDao implements IGoodDao {
         int count=ia.selectGoodCount();
         return count;
     }
+
+    public int selectGoodCountMoreIf(Map<String,Object> map) {
+        return 0;
+    }
+
     /*根据编号进行查询*/
     public List<Good> selectGoodById(int gid) {
         //打开会话
@@ -61,6 +67,15 @@ public class goodDao implements IGoodDao {
         List<Good> entity=ia.selectGoodById(gid);
         return entity;
     }
+
+    public List<Good> selectGoodMoreIfPage(Map<String, Object> map) {
+        return null;
+    }
+
+    public List<Good> selectGoodMoreIfPage2(List<GoodPage> listpage) {
+        return null;
+    }
+
     /*分页*/
     public List<Good> selectGoodPage(int arg0, int arg1) {
         //打开会话

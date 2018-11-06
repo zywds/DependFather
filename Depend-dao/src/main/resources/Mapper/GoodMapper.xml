@@ -25,6 +25,18 @@
     <select id="selectGoodCount" resultType="int">
         select count(*)from good
     </select>
+    <!--查询商品数量并带有查询-->
+    <select id="selectGoodCountMoreIf" resultType="int">
+        select count(*)from good
+        <where>
+            <if test="gname !=null and gname !=''">
+                gName like '%${gname}%'
+            </if>
+            <if test="gprice !=null and gprice !=''">
+                and gprice=#{gprice}
+            </if>
+        </where>
+    </select>
     <!--根据编号进行查询-->
     <select id="selectGoodById" parameterType="int" resultType="Good">
         select *from good where gId=#{gid}
@@ -33,15 +45,38 @@
     <select id="selectGoodPage" resultType="Good">
         select *from good limit ${param1},${param2}
     </select>
+    <!--分页与多条件查询的组合-->
+    <select id="selectGoodMoreIfPage" resultType="Good">
+        select *from good
+        <where>
+            <if test="gname !=null and gname !=''">
+                gName like '%${gname}%'
+            </if>
+            <if test="gprice !=null and gprice !=''">
+                and gprice=#{gprice}
+            </if>
+        </where>
+        limit ${page},${limit}
+    </select>
+    <!--分页与多条件查询的组合-->
+    <select id="selectGoodMoreIfPage2" resultType="Good">
+        select *from good limit ${page},${limit}
+    </select>
     <!--多条件查询-->
     <select id="selectGoodMoreIf" resultType="Good">
         select *from good
         <where>
-            <if test="gname !=null">
+            <if test="gname !=null and gname !=''">
                 gName like '%${gname}%'
             </if>
-            <if test="gid !=null">
-                or gId=#{gid}
+            <if test="gid !=null and gid !=''">
+                and gId=#{gid}
+            </if>
+            <if test="gprice !=null and gprice !=''">
+                and gprice=#{gprice}
+            </if>
+            <if test="gpicture !=null and gpicture !=''">
+                and gpicture=#{gpicture}
             </if>
         </where>
     </select>

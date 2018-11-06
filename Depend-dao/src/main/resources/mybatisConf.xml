@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE configuration
-        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-config.dtd">
-<configuration>
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+    <configuration>
     <!--&lt;!&ndash;导入dbconfig.properties文件中的所有key-value数据&ndash;&gt;
     <properties resource="dbconfig.properties"></properties>-->
     <!--设置-->
-    <!--<settings>
-        &lt;!&ndash;设置日志文件&ndash;&gt;
+    <settings>
+        <!--设置日志文件-->
+        <setting name="cacheEnabled" value="true"></setting>
         <setting name="logImpl" value="STDOUT_LOGGING"/>
-    </settings>-->
+    </settings>
     <!--&lt;!&ndash;别名&ndash;&gt;
     <typeAliases>
         <package name="com.zhangyuwei.depend.entities" ></package>

@@ -1,5 +1,6 @@
 package com.zhangyuwei.depend.controller;
 
+import com.zhangyuwei.depend.common.util.R;
 import com.zhangyuwei.depend.entities.Good;
 import com.zhangyuwei.depend.entities.UpLoad;
 import com.zhangyuwei.depend.mapper.IGoodDao;
@@ -30,7 +31,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -89,23 +92,27 @@ public class goodServlet {
     /*删除商品*/
     @RequestMapping(value = "/deleteGood",method = RequestMethod.POST)
     @ResponseBody
-    public void deleteGood(@RequestBody Integer gid,HttpServletResponse response){
+    public R deleteGood(@RequestBody Integer gid,HttpServletResponse response){
         /*解决服务端的乱码问题*/
         response.setCharacterEncoding("utf-8");
         int row=dao.deleteGood(gid);
-        if(row>0){
-            try {
-                response.getWriter().print("删除成功!");
+        if(row>0) {
+            /*try {
+                response.getWriter().print(R.ok("删除成功"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            //response.getWriter().print("删除成功!");
         }else{
             try {
                 response.getWriter().print("删除失败!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }*/
+            return R.ok("删除成功!");
         }
+        return R.error("删除失败!");
     }
     /*多项删除*/
     @RequestMapping("/deleteGoodMore")
@@ -127,11 +134,46 @@ public class goodServlet {
         int count=dao.selectGoodCount();
         return count;
     }
+    /*查询商品数量根据查询条件*/
+    @RequestMapping("/selectGoodCountMoreIf")
+    @ResponseBody
+    public int selectGoodCountMoreIf(@RequestBody List<Object> objectList){
+        Map<String,Object> map=new HashMap<>();
+        map.put("gname",objectList.get(0));
+        map.put("gprice",objectList.get(1));
+        int count=dao.selectGoodCountMoreIf(map);
+        return count;
+    }
+    /*分页与查询之间的组合*/
+    @RequestMapping(value = "/selectGoodMoreIfPage",method = RequestMethod.POST)
+    @ResponseBody
+    public List<Good> selectGoodMoreIfPage(@RequestBody List<Object> integerList){
+
+        Map<String,Object> map=new HashMap<>();
+        Object page=integerList.get(0);Object limit=integerList.get(1);
+        int pages=(int)page;int limits=(int)limit;
+        map.put("page",(pages-1)*limits);
+        map.put("limit",limits);
+        map.put("gname",integerList.get(2));
+        map.put("gprice",integerList.get(3));
+        List<Good> entity=dao.selectGoodMoreIfPage(map);
+        return entity;
+    }
     /*分页*/
     @RequestMapping("/selectGoodPage")
     @ResponseBody
     public List<Good> selectGoodPage(@RequestBody List<Integer> integerList){
         List<Good> entity=dao.selectGoodPage((integerList.get(0)-1)*(integerList.get(1)),integerList.get(1));
+        return entity;
+    }
+    /*多条件查询*/
+    @RequestMapping(value = "/selectGoodMoreIf",method = RequestMethod.POST)
+    @ResponseBody
+    public List<Good> selectGoodMoreIf(@RequestBody List<Good> goodList){
+        Map<String,Object> map=new HashMap<String, Object>();
+        map.put("gname",goodList.get(0).getGname());
+        map.put("gprice",goodList.get(0).getGprice());
+        List<Good> entity=dao.selectGoodMoreIf(map);
         return entity;
     }
     /*文件上传*/
@@ -221,7 +263,7 @@ public class goodServlet {
         if(!f.exists()){
             f.mkdir();
         }
-        //保存文件
+        //保存文件3
         File tempFile=new File(path, files.getOriginalFilename());
         files.transferTo(tempFile);//把文件从内存存到磁盘中
         System.out.println(path+"\\"+files.getOriginalFilename());

@@ -5,6 +5,10 @@ import com.zhangyuwei.depend.mapper.IGoodDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 import sun.nio.cs.ext.Big5;
 
 import java.math.BigDecimal;
@@ -14,8 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-
+@Service
 public class goodDaoTest {
+    /*这里是自动装配，当要使用时，必须newgoodDaoTest对象*/
+    @Autowired
+    IGoodDao dao;
+
     IGoodDao ia=null;
     @Before
     public void setUp() throws Exception {
@@ -89,10 +97,14 @@ public class goodDaoTest {
     /*多条件查询*/
     @Test
     public void selectGoodMoreIf(){
+        ApplicationContext ctx=new ClassPathXmlApplicationContext("applicationContext.xml");
+        //IGoodDao dao=ctx.getBean(IGoodDao.class);
+        goodDaoTest g=ctx.getBean(goodDaoTest.class);
         Map<String,Object> map=new HashMap<String, Object>();
-        map.put("gname","益达");
-        //map.put("gid",8);
-        List<Good> entity=ia.selectGoodMoreIf(map);
+        map.put("gname","益达尊享护齿装草本40粒+冰柠40粒+西");
+        map.put("gid","");
+        List<Good> entity=g.dao.selectGoodMoreIf(map);
+        //List<Good> entity=dao.selectGoodMoreIf(map);
         System.out.println(entity);
     }
     /*批量删除*/

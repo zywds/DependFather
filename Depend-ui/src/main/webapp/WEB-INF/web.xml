@@ -6,12 +6,12 @@
     <!--<listener>
         <description>Spring容器加载监听器</description>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+    </listener>-->
     <context-param>
         <description>设置Spring加载时的配置文件位置，默认位置在WEB-INF/lib目录下</description>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath*:applicationContext.xml</param-value>
-    </context-param>-->
+    </context-param>
     <!--Spring MVC 前置Servlet，中心控制器 -->
   <servlet>
     <!--名称 -->
@@ -22,6 +22,7 @@
       <!--SpringMVC配置参数文件的位置 -->
       <param-name>contextConfigLocation</param-name>
       <!--默认名称为ServletName-servlet.xml ,默认存放在resources目录下-->
+      <!--spring-Mvc配置-->
       <param-value>classpath*:springmvc-servlet.xml</param-value>
     </init-param>
     <!-- 启动顺序，数字越小，启动越早 -->

@@ -18,6 +18,8 @@
     <context:property-placeholder location="classpath*:dbconfig.properties" />
 
     <!--2 配置C3P0数据源 -->
+    <!--连接池，提高数据库的性能，产生更多的并发连接数-->
+    <!--这个来自c3p0包-->
     <bean id="datasource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
         <!--驱动类名 -->
         <property name="driverClass" value="${mysql.driver}" />
@@ -38,16 +40,20 @@
     </bean>
 
     <!--3 会话工厂bean sqlSessionFactoryBean -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" p:configLocation="mybatisConf.xml">
+    <!--以前的话，我们需要自己去构建会话工厂，现在通过这个，会自动构建-->
+    <!--这里面的名称也就是它所带方法里面的属性-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" p:configLocation="mybatisConf.xml" >
         <!-- 数据源 -->
         <property name="dataSource" ref="datasource"></property>
         <!-- 别名 -->
         <property name="typeAliasesPackage" value="com.zhangyuwei.depend.entities"></property>
         <!-- sql映射文件路径 -->
         <property name="mapperLocations" value="classpath*:Mapper/*Mapper.xml"></property>
+        <!--<property name="configLocation" value="mybatisConf.xml"></property>-->
     </bean>
 
     <!--4 自动扫描对象关系映射 -->
+    <!--拿到会话工厂，实现与接口之间的映射-->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <!--指定会话工厂，如果当前上下文中只定义了一个则该属性可省去 -->
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
@@ -64,7 +70,9 @@
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <!--6 容器自动扫描IOC组件  -->
-    <context:component-scan base-package="com.zhangyuwei.depend.mapper"></context:component-scan>
+    <!--这个地方不太了解到底知道哪里？-->
+    <!--这里放你要自动装配的对象-->
+    <context:component-scan base-package="com.zhangyuwei.depend.dao"></context:component-scan>
 
     <!--7 aspectj支持自动代理实现AOP功能 -->
     <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
